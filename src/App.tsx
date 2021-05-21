@@ -3,12 +3,11 @@ import SignIn from './components/auth/SignIn';
 import Chat from './components/chat/Chat';
 import reducer from './reducer'
 import {Message, Status, User} from './interfaces'
-
 import io from 'socket.io-client'
 import axios from "axios";
 import Notification from "./components/notifications/Not";
-
-export const socket = io('http://localhost:9999');
+export const url = 'http://192.168.100.6:8080/';
+export const socket = io(url);
 
 const App = () => {
 
@@ -64,7 +63,15 @@ const App = () => {
             payload: user
         });
         socket.emit('ROOM:JOIN', user)
-        const res = await axios.get(`/rooms`)
+        const res = await axios.get(`http://192.168.100.6:8080/rooms`,
+            {
+                headers: {
+                    'Access-Control-Allow-Headers': '*',
+                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+                    'Access-Control-Allow-Origin': 'http://localhost:3000'
+                }
+            }
+        )
         dispatch({
             type: 'SET_DATA',
             payload: res.data

@@ -1,5 +1,7 @@
 const express = require('express');
 
+var cors = require('cors')
+
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server, {
@@ -10,8 +12,9 @@ const io = require('socket.io')(server, {
 
 const rooms = new Map()
 
+app.use(cors())
 app.use(express.json())
-app.use(express.urlencoded({extended: true})) //парсинг ссылки
+app.use(express.urlencoded({ extended: true })) //парсинг ссылки
 
 app.post('/rooms', (req, res) => {
     const { roomId } = req.body
@@ -57,8 +60,8 @@ io.on('connection', (socket) => {
     socket.on('ROOM:CHANGE_STATUS', (data) => {
         socket.to(1).broadcast.emit('ROOM:CHANGE_STATUS', data)
     })
-    socket.on('disconnect',() => {
-        rooms.forEach((value ,roomId) => {
+    socket.on('disconnect', () => {
+        rooms.forEach((value, roomId) => {
             socket.to(1).broadcast.emit('ROOM:DISCONNECT_SOME_USER', value.get('users').get(socket.id))
 
             if (value.get('users').delete(socket.id)) {
@@ -72,7 +75,7 @@ io.on('connection', (socket) => {
 
 
 
-server.listen(9999, (error) => {
+server.listen(8080, (error) => {
     if (error) {
         throw Error(error)
     }

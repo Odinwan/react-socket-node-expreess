@@ -4,6 +4,7 @@ import {User} from '../../interfaces'
 import './SignIn.css';
 import Notification from "../notifications/Not";
 import moment from "moment";
+import {url} from "../../App";
 
 interface SignInProps {
     socket: any,
@@ -13,11 +14,10 @@ interface SignInProps {
 const SignIn = ({onLogin}: SignInProps) => {
 
     const [userName, setName] = useState<string>('');
-    const [roomId, setRoomId] = useState<number>(1);
+    const [roomId] = useState<number>(1);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [status, setStatus] = useState<string>('');
     const [error, setError] = useState<string>('');
-
 
     const submit = () => {
         if (userName !== '') {
@@ -26,7 +26,15 @@ const SignIn = ({onLogin}: SignInProps) => {
                 const time = moment().format('LT')
                 const user: User = {roomId, userName,time}
                 await axios
-                    .post('/rooms', user)
+                    .post('http://192.168.100.6:8080/rooms', user,
+                        {
+                            headers: {
+                                'Access-Control-Allow-Headers': '*',
+                                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+                                'Access-Control-Allow-Origin': 'http://localhost:3000'
+                            }
+                        }
+                    )
                     .then((res) => {
                         onLogin(user)
                         setStatus('')
@@ -39,6 +47,7 @@ const SignIn = ({onLogin}: SignInProps) => {
             setError('Введите имя')
         }
     }
+
     const animationText = (value: string) => {
         return `${value}...`
     }
